@@ -1,0 +1,174 @@
+[
+  {
+    "version": "0.1.5",
+    "date": "2026-11-16",
+    "changes": [
+      {
+        "category": "Interface",
+        "items": [
+          "The toolbar marks the page or account on screen with the same background as hover, without a border; clicking an account button no longer leaves a focus outline.",
+          "The update button moved to the footer, next to the version (Windows)."
+        ]
+      },
+      {
+        "category": "Fixes and performance",
+        "items": [
+          "Notification tests use a private test notification service, so they no longer crash when no notification daemon is running.",
+          "If file drop cannot be set up for a page, Whazapp logs it instead of stopping (Linux).",
+          "All GTK tests, including notifications, run together in a single test process."
+        ]
+      },
+      {
+        "category": "New features",
+        "items": [
+          "A floating blur button on the chat page hides Messages, the Chat list, Images and media, or the Full screen; the choice is saved per account (Linux).",
+          "Check for updates verifies the installer against the release's SHA256SUMS and saves it to your Downloads folder.",
+          "Whazapp checks for updates by itself at most once every 24 hours."
+        ]
+      },
+      {
+        "category": "Release and maintenance",
+        "items": [
+          "Update checks read releases from github.com/azislamayuda/zWhazapp."
+        ]
+      }
+    ]
+  },
+  {
+    "version": "0.1.4",
+    "date": "2026-11-15",
+    "changes": [
+      {
+        "category": "Fixes",
+        "items": [
+          "Documents opened from WhatsApp, such as PDFs, show in their own window when WebKit can display them; other file types go to the normal download flow (Linux).",
+          "An account whose page crashes reloads by itself, at most once a minute, instead of staying blank until you press Reload (Linux)."
+        ]
+      },
+      {
+        "category": "Release and maintenance",
+        "items": [
+          "GTK tests share one GTK thread, so they run together in a single cargo test process."
+        ]
+      }
+    ]
+  },
+  {
+    "version": "0.1.3",
+    "date": "2026-11-02",
+    "changes": [
+      {
+        "category": "New features",
+        "items": [
+          "Unread badges: each Whaz account button shows its unread chat count, and the total appears in the window title; the tray stays icon-only (Linux).",
+          "Keyboard shortcuts: Ctrl+1/2/3 open Whaz 1–3, Ctrl+, opens Settings, Ctrl+R or F5 reloads, Ctrl+Q quits (Linux). They are listed in Settings > General.",
+          "Settings > Accounts shows which accounts have camera or microphone permission and lets you forget it, so the next call asks again (Linux)."
+        ]
+      },
+      {
+        "category": "Interface",
+        "items": [
+          "Settings > Accounts and the account switcher in the toolbar use the new WhatsApp chat icon.",
+          "Check for updates moved from the top toolbar to the footer, just before the version.",
+          "Settings no longer shows a Back to chats button; the footer text lines up with the Whazapp header."
+        ]
+      },
+      {
+        "category": "Fixes and performance",
+        "items": [
+          "Each Whaz account may now store up to 10% of the disk instead of WebKit's fixed 1000 MiB, the likely cause of WhatsApp's \"not enough space\" warning and the logout after it (Linux).",
+          "The chat lock accepts any password you choose; there is no minimum length or other rule.",
+          "Per-account memory limits now actually apply (WebKit rejected them before because of their order).",
+          "Smaller, cleaner stylesheet and icon set with identical layout."
+        ]
+      },
+      {
+        "category": "Release and maintenance",
+        "items": [
+          "Updated Rust dependencies to their latest compatible patch releases (Tauri 2.12.5, Wry 0.57.1).",
+          "Linux release tooling builds only the WebRTC AppImage; the DEB/RPM and system-WebKit AppImage scripts were removed.",
+          "One GitHub workflow builds, in order: validation, the Linux AppImage, the Windows EXE, the version tag and a draft release whose description lists only the new features and changes.",
+          "Removed unused code, icons and test helpers; tests follow the new app identity."
+        ]
+      }
+    ]
+  },
+  {
+    "version": "0.1.2",
+    "date": "2026-11-01",
+    "changes": [
+      {
+        "category": "Voice and video calls on Linux",
+        "items": [
+          "Voice and video calls work in the Linux AppImage, which now ships its own WebKitGTK 2.55 runtime with WebRTC.",
+          "WhatsApp no longer reports \"Your browser doesn't support calling\": Whazapp provides the SharedArrayBuffer it requires.",
+          "Outgoing video no longer freezes and your own preview no longer spins: video calls use VP8/VP9 instead of the runtime's failing H.264 encoder.",
+          "\"Switch to other window\" opens a separate call window instead of asking to allow pop-ups; it closes when the call ends.",
+          "Allowing the camera and microphone once is remembered per account, also after restarting Whazapp.",
+          "Fixed a crash on the first video call and a prompt bug that denied the camera after the microphone prompt.",
+          "The screen no longer sleeps or locks during a call, and can sleep again when the call ends.",
+          "Settings > Check calling capabilities names exactly what WhatsApp is missing and tests the video encoders."
+        ]
+      },
+      {
+        "category": "Release and identity",
+        "items": [
+          "Linux releases are AppImage only; DEB and RPM are discontinued because distribution WebKitGTK packages cannot make calls. Windows stays an .exe installer.",
+          "New application identity io.azislamayuda.whazapp.desktop. Profiles and settings of earlier versions stay in the old io.whazapp.desktop folders; link WhatsApp again or copy them manually.",
+          "Account pages run in WebKit's sandbox, with hardware-accelerated video rendering in the AppImage."
+        ]
+      },
+      {
+        "category": "Performance and cleanup",
+        "items": [
+          "Lower memory use per account: no in-memory resource cache or back/forward cache, and each account's web process frees memory earlier without ever being closed for it.",
+          "Code cleanup: one WhatsApp origin check, one chat-lock check per account switch, and no lint warnings in app or tests."
+        ]
+      }
+    ]
+  },
+  {
+    "version": "0.1.1",
+    "date": "2026-10-25",
+    "changes": [
+      {
+        "category": "Interface improvements",
+        "items": [
+          "Moved top navigation icons to the right and added a small Whazapp tagline.",
+          "Moved the installed version and GitHub author to a bottom-right footer.",
+          "Added an on-demand GitHub release check with toast feedback; updates are downloaded manually.",
+          "Preserved existing account profiles and login storage."
+        ]
+      }
+    ]
+  },
+  {
+    "version": "0.1.0",
+    "date": "2026-10-24",
+    "changes": [
+      {
+        "category": "Initial release",
+        "items": [
+          "Soft green desktop interface with responsive navigation, English UI, and Light, Dark, and System themes.",
+          "Rust and Tauri desktop application for Linux, with Windows 10/11 x64 source and installer tooling.",
+          "Official WhatsApp Web QR linking in the main window, persistent local sessions, and three isolated Whaz account slots.",
+          "Single-instance activation, system tray controls, optional hidden tray icon, and background startup after desktop sign-in.",
+          "Desktop notifications with click-to-open, Do Not Disturb, sound preferences, and hidden message previews.",
+          "Settings with About, changelog, notification testing, and browser calling capability diagnostics.",
+          "Privacy blur for the entire page or selected areas, plus password-protected chat access and Lock now.",
+          "Encrypted backup and restore for settings and manually imported contact/chat archives; live WhatsApp databases and login sessions are excluded.",
+          "File downloads, multi-file drag and drop, image/sticker attachment modes, and clipboard compatibility improvements.",
+          "Linux AppImage, DEB, and RPM build tooling, plus a Windows NSIS installer workflow."
+        ]
+      },
+      {
+        "category": "Security and limitations",
+        "items": [
+          "Remote WhatsApp views are separated from trusted local Tauri commands; external navigation requires a user action.",
+          "Camera and microphone use requires permission. Linux voice/video calling depends on WebKit capabilities and is not a verified feature of this release.",
+          "This initial public version consolidates pre-repository development. Experimental WebRTC runtimes are not included."
+        ]
+      }
+    ]
+  }
+]
