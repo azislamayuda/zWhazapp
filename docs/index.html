@@ -6,6 +6,10 @@
 <title>Whazapp untuk Linux dan Windows</title>
 <meta name="description" content="Whazapp membuka WhatsApp Web sebagai aplikasi desktop untuk Linux dan Windows: beberapa akun, panggilan, notifikasi, dan blur privasi.">
 <link rel="icon" href="assets/icon.png" type="image/png">
+<link rel="alternate" hreflang="id" href="https://azislamayuda.github.io/zWhazapp/?lang=id">
+<link rel="alternate" hreflang="en" href="https://azislamayuda.github.io/zWhazapp/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://azislamayuda.github.io/zWhazapp/">
+<script>document.documentElement.classList.add('js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
@@ -24,6 +28,9 @@
     --dot: #4f9a6e;
     --code-bg: #1f3d2e;
     --code-ink: #e2f1e7;
+    --glass: rgba(243, 248, 244, .74);
+    --glass-line: rgba(44, 110, 74, .14);
+    --shadow: rgba(31, 61, 46, .12);
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
@@ -41,6 +48,9 @@
       --dot: #6fb48d;
       --code-bg: #0b1711;
       --code-ink: #dcefe3;
+      --glass: rgba(17, 32, 25, .72);
+      --glass-line: rgba(141, 205, 171, .16);
+      --shadow: rgba(0, 0, 0, .35);
       color-scheme: dark;
     }
   }
@@ -68,9 +78,40 @@
   /* Hero: the dot field sits in the lower half, the text stays on calm background. */
   .hero { position: relative; overflow: hidden; background: var(--wash); border-bottom: 1px solid var(--line); }
   .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
-  .hero .wrap { position: relative; padding-top: clamp(56px, 10vw, 120px); padding-bottom: clamp(140px, 22vw, 240px); }
-  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--muted); margin-bottom: clamp(32px, 6vw, 64px); }
-  .brand img { width: 24px; height: 24px; border-radius: 6px; }
+  .hero .wrap { position: relative; padding-top: clamp(120px, 14vw, 176px); padding-bottom: clamp(140px, 22vw, 240px); }
+  /* Top menu: transparent over the hero, a smaller frosted bar once the page scrolls. */
+  .skip { position: absolute; left: 16px; top: -100px; z-index: 60; padding: 10px 16px; background: var(--green); color: var(--on-green); border-radius: 10px; font-weight: 700; }
+  .skip:focus { top: 12px; }
+  .topbar { position: fixed; inset: 0 0 auto; z-index: 50; border-bottom: 1px solid transparent; transition: background-color .3s, border-color .3s, box-shadow .3s; }
+  .topbar-inner { display: flex; align-items: center; gap: 28px; min-height: 76px; transition: min-height .3s; }
+  .topbar.scrolled { background: var(--glass); border-bottom-color: var(--glass-line); box-shadow: 0 8px 28px var(--shadow); -webkit-backdrop-filter: blur(16px) saturate(1.4); backdrop-filter: blur(16px) saturate(1.4); }
+  .topbar.scrolled .topbar-inner { min-height: 56px; }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .topbar.scrolled { background: var(--bg); } }
+  .brand { display: flex; align-items: center; gap: 10px; margin-right: auto; font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); text-decoration: none; transition: font-size .3s; }
+  .brand:hover { color: var(--ink); }
+  .brand img { width: 28px; height: 28px; border-radius: 7px; transition: width .3s, height .3s; }
+  .topbar.scrolled .brand { font-size: 1.05rem; }
+  .topbar.scrolled .brand img { width: 22px; height: 22px; }
+  .nav-links { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; }
+  .nav-links a { display: block; padding: 8px 12px; border-radius: 9px; color: var(--ink); font-weight: 700; font-size: .95rem; text-decoration: none; }
+  .nav-links a:hover { background: var(--wash); color: var(--green); }
+  .topbar .button { min-height: 44px; padding: 8px 18px; font-size: .95rem; transition: background-color .15s, min-height .3s; }
+  .topbar.scrolled .button { min-height: 40px; }
+  @media (max-width: 760px) { .nav-links { display: none; } .topbar-inner { min-height: 64px; } }
+  @media (prefers-reduced-motion: reduce) { .topbar, .topbar-inner, .brand, .brand img, .topbar .button { transition: none; } }
+  section, header { scroll-margin-top: 64px; }
+
+  /* Back to top: appears after the hero. */
+  .to-top { position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); z-index: 40; width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid var(--glass-line); border-radius: 14px; background: var(--green); color: var(--on-green); cursor: pointer; box-shadow: 0 8px 24px var(--shadow); opacity: 0; visibility: hidden; transform: translateY(12px); transition: opacity .25s, transform .25s, visibility .25s, background-color .15s; }
+  .to-top.show { opacity: 1; visibility: visible; transform: none; }
+  .to-top:hover { background: var(--green-hover); }
+  .to-top svg { width: 22px; height: 22px; }
+  @media (prefers-reduced-motion: reduce) { .to-top { transition: none; transform: none; } }
+
+  /* Scroll reveal: only when JavaScript runs and motion is welcome. */
+  html.js [data-reveal] { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .8s cubic-bezier(.2, .7, .2, 1); transition-delay: calc(var(--d, 0) * 80ms); }
+  html.js [data-reveal].in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { html.js [data-reveal] { opacity: 1; transform: none; transition: none; } }
   .hero h1 { font-size: clamp(3.25rem, 2rem + 7vw, 7rem); font-weight: 700; letter-spacing: -0.03em; }
   .tagline { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: clamp(1.15rem, 1rem + 0.8vw, 1.5rem); color: var(--muted); margin-top: 12px; }
   .lead { max-width: 34em; margin-top: 24px; font-size: 1.1rem; }
@@ -104,7 +145,9 @@
 
   /* Features: a quiet two-column list, not a card grid. */
   .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; margin: 40px 0 0; padding: 0; list-style: none; }
-  .features li { padding: 22px 0; border-top: 1px solid var(--line); }
+  .features li { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 0 18px; align-items: start; padding: 24px 0; border-top: 1px solid var(--line); }
+  .icon { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--wash); color: var(--green); border: 1px solid var(--line); }
+  .icon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
   .features p { margin-top: 6px; color: var(--muted); }
   .platform { display: inline-block; margin-left: 6px; font-family: "Atkinson Hyperlegible", sans-serif; font-size: .8rem; font-weight: 700; color: var(--muted); }
   kbd { font: 700 .85em/1 "Atkinson Hyperlegible", sans-serif; padding: 2px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); color: var(--ink); }
@@ -132,122 +175,182 @@
   .verify p { max-width: 40em; }
   code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .92em; }
 
+  .built { margin-top: 28px; font-size: .95rem; color: var(--muted); }
+  .lang { min-width: 44px; min-height: 40px; padding: 0 10px; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--ink); font: 700 .9rem/1 "Atkinson Hyperlegible", system-ui, sans-serif; cursor: pointer; }
+  .lang:hover { background: var(--wash); color: var(--green); }
+  html:not(.js) .lang { display: none; }
+  @media (max-width: 760px) { .topbar-inner { gap: 12px; } }
+
+  /* Rust: heading and lead on the left, three facts on the right. */
+  .rust { border-top: 1px solid var(--line); }
+  .rust .wrap { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 40px 72px; align-items: start; }
+  .rust h2 { font-size: clamp(2.25rem, 1.4rem + 3.4vw, 3.75rem); letter-spacing: -0.02em; }
+  .rust-lead { margin-top: 18px; color: var(--muted); max-width: 30em; }
+  .rust ul { margin: 0; padding: 0; list-style: none; }
+  .rust li { padding: 22px 0; border-top: 1px solid var(--line); }
+  .rust li:first-child { padding-top: 0; border-top: 0; }
+  .rust li p { margin-top: 6px; color: var(--muted); }
+  @media (max-width: 820px) { .rust .wrap { grid-template-columns: 1fr; } }
+
   footer { border-top: 1px solid var(--line); padding: 32px 0 40px; color: var(--muted); font-size: .95rem; }
   footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
 </style>
 </head>
 <body>
-<header class="hero">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-accounts" viewBox="0 0 24 24"><circle cx="9" cy="6" r="4"/><path d="M12.5 4.34A3 3 0 1 1 12.5 7.66"/><ellipse cx="9" cy="17" rx="7" ry="4"/><path d="M18 14c1.75.38 3 1.36 3 2.5 0 1.03-1.01 1.92-2.5 2.37"/></symbol>
+  <symbol id="i-call" viewBox="0 0 24 24"><path d="M5 4h3.2l1.8 4.6-2.4 1.6a11.5 11.5 0 0 0 6.2 6.2l1.6-2.4 4.6 1.8V19a2 2 0 0 1-2.2 2A17 17 0 0 1 3 6.2 2 2 0 0 1 5 4Z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18.75 9.7V9c0-3.87-3.02-7-6.75-7S5.25 5.13 5.25 9v.7c0 .85-.24 1.68-.69 2.38l-1.1 1.73c-1.02 1.57-.24 3.71 1.51 4.21a26.6 26.6 0 0 0 14.06 0c1.76-.5 2.53-2.64 1.52-4.21l-1.11-1.73a4.4 4.4 0 0 1-.69-2.38Z"/><path d="M7.5 19c.66 1.75 2.42 3 4.5 3s3.85-1.25 4.5-3"/></symbol>
+  <symbol id="i-blur" viewBox="0 0 24 24"><path d="M3 3l18 18"/><path d="M10.6 5.1A9.8 9.8 0 0 1 12 5c5 0 8.5 4.3 9.5 7-.4 1-1.2 2.3-2.3 3.5M6.6 6.6C4.6 8 3.1 10 2.5 12c1 2.7 4.5 7 9.5 7 1.9 0 3.6-.6 5-1.5"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+  <symbol id="i-keys" viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6.5 10h.01M10 10h.01M14 10h.01M17.5 10h.01M7.5 14h9"/></symbol>
+  <symbol id="i-update" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 0 16 0"/><path d="M12 14V4m0 0 3 3m-3-3L9 7"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8.5 5.5-14 15-15-.8 9.6-6.4 15-15 15Z"/><path d="M5 19l7.5-7.5"/></symbol>
+</svg>
+<a class="skip" href="#konten" data-i18n="skip">Lewati ke konten</a>
+<nav class="topbar" id="menu" aria-label="Menu utama" data-i18n-attr="aria-label:nav.label">
+  <div class="wrap topbar-inner">
+    <a class="brand" href="#top"><img src="assets/icon.png" alt="" width="28" height="28">Whazapp</a>
+    <ul class="nav-links">
+      <li><a href="#tampilan" data-i18n="nav.screens">Tampilan</a></li>
+      <li><a href="#fitur" data-i18n="nav.features">Fitur</a></li>
+      <li><a href="#rust">Rust</a></li>
+      <li><a href="#kenapa" data-i18n="nav.why">Kenapa</a></li>
+      <li><a href="#verifikasi" data-i18n="nav.verify">Verifikasi</a></li>
+    </ul>
+    <button class="lang" id="lang" type="button"></button>
+    <a class="button" href="#unduh" data-i18n="nav.download">Unduh</a>
+  </div>
+</nav>
+<header class="hero" id="top">
   <canvas id="field" aria-hidden="true"></canvas>
   <div class="wrap">
-    <div class="brand"><img src="assets/icon.png" alt="" width="24" height="24">Whazapp</div>
     <h1>Whazapp</h1>
-    <p class="tagline">Sedikit ruang. Cerita tanpa akhir.</p>
-    <p class="lead">WhatsApp Web sebagai aplikasi desktop untuk Linux dan Windows. Beberapa akun, panggilan, dan notifikasi dalam satu jendela, tanpa membuka browser.</p>
+    <p class="tagline" data-i18n="hero.tagline">Sedikit ruang. Cerita tanpa akhir.</p>
+    <p class="lead" data-i18n="hero.lead">WhatsApp Web sebagai aplikasi desktop untuk Linux dan Windows. Beberapa akun, panggilan, dan notifikasi dalam satu jendela, tanpa membuka browser.</p>
     <div class="actions">
       <a class="button" href="#unduh">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
-        <span>Unduh versi <span data-version>0.1.5</span></span>
+        <span data-i18n="hero.download">Unduh versi <span data-version>0.1.5</span></span>
       </a>
-      <a data-link="releases" href="https://github.com/azislamayuda/zWhazapp/releases/latest">Lihat catatan rilis</a>
+      <a data-link="releases" href="https://github.com/azislamayuda/zWhazapp/releases/latest" data-i18n="hero.notes">Lihat catatan rilis</a>
     </div>
+    <p class="built" data-i18n="hero.built">Dibangun dengan <a href="#rust">Rust</a> dan Tauri 2.</p>
   </div>
 </header>
 
-<main>
-  <section class="screens" aria-labelledby="tampilan-judul">
+<main id="konten">
+  <section class="screens" id="tampilan" aria-labelledby="tampilan-judul">
     <div class="wrap">
-      <h2 id="tampilan-judul">Tampilan</h2>
-      <p class="section-intro">Tangkapan layar Whazapp 0.1.5 di Linux. Klik gambar untuk melihat ukuran penuh.</p>
-      <figure class="shot shot-main">
-        <a href="assets/screens/chat-blur.webp"><img src="assets/screens/chat-blur.webp" width="1124" height="836" alt="Halaman chat Whazapp dengan menu blur terbuka: pilihan Messages dan Chat list aktif, sehingga isi pesan dan daftar chat tersamar."></a>
-        <figcaption>Blur privasi: pilih area yang disamarkan langsung dari halaman chat.</figcaption>
+      <h2 id="tampilan-judul" data-reveal data-i18n="screens.title">Tampilan</h2>
+      <p class="section-intro" data-reveal style="--d:1" data-i18n="screens.intro">Tangkapan layar Whazapp 0.1.5 di Linux. Klik gambar untuk melihat ukuran penuh.</p>
+      <figure class="shot shot-main" data-reveal style="--d:2">
+        <a href="assets/screens/chat-blur.webp"><img src="assets/screens/chat-blur.webp" width="1124" height="836" data-i18n-attr="alt:shot.blur.alt" alt="Halaman chat Whazapp dengan menu blur terbuka: pilihan Messages dan Chat list aktif, sehingga isi pesan dan daftar chat tersamar."></a>
+        <figcaption data-i18n="shot.blur">Blur privasi: pilih area yang disamarkan langsung dari halaman chat.</figcaption>
       </figure>
-      <div class="shot-row" tabindex="0" role="region" aria-label="Tangkapan layar lain, geser untuk melihat semua">
-        <figure class="shot"><a href="assets/screens/home.webp"><img src="assets/screens/home.webp" width="1124" height="836" loading="lazy" alt="Beranda Whazapp dengan tombol Open WhatsApp Web dan tiga langkah menautkan ponsel."></a><figcaption>Beranda: tautkan ponsel dengan kode QR resmi WhatsApp Web.</figcaption></figure>
-        <figure class="shot"><a href="assets/screens/accounts.webp"><img src="assets/screens/accounts.webp" width="1124" height="836" loading="lazy" alt="Toolbar dengan tiga tombol akun dan badge pesan belum dibaca, daftar chat tersamar."></a><figcaption>Tiga akun di toolbar, masing-masing dengan badge belum dibaca.</figcaption></figure>
-        <figure class="shot"><a href="assets/screens/lock.webp"><img src="assets/screens/lock.webp" width="1124" height="836" loading="lazy" alt="Layar Your chats are locked dengan kolom password."></a><figcaption>Kunci chat: masukkan password untuk membuka akun.</figcaption></figure>
-        <figure class="shot"><a href="assets/screens/privacy.webp"><img src="assets/screens/privacy.webp" width="1124" height="836" loading="lazy" alt="Pengaturan Privacy dengan bagian Chat lock dan Enable privacy blur."></a><figcaption>Pengaturan privasi: kunci chat dan blur untuk semua akun.</figcaption></figure>
-        <figure class="shot"><a href="assets/screens/settings.webp"><img src="assets/screens/settings.webp" width="1124" height="836" loading="lazy" alt="Pengaturan General dengan pilihan tema, ikon tray, dan mulai saat login."></a><figcaption>Pengaturan umum: tema, ikon tray, dan mulai saat login.</figcaption></figure>
-        <figure class="shot"><a href="assets/screens/about.webp"><img src="assets/screens/about.webp" width="1124" height="836" loading="lazy" alt="Halaman About and updates dengan tombol Check calling capabilities dan changelog."></a><figcaption>Tentang dan update, termasuk cek kemampuan panggilan.</figcaption></figure>
+      <div class="shot-row" tabindex="0" role="region" aria-label="Tangkapan layar lain, geser untuk melihat semua" data-i18n-attr="aria-label:shots.label">
+        <figure class="shot" data-reveal style="--d:0"><a href="assets/screens/home.webp"><img src="assets/screens/home.webp" width="1124" height="836" loading="lazy" data-i18n-attr="alt:shot.home.alt" alt="Beranda Whazapp dengan tombol Open WhatsApp Web dan tiga langkah menautkan ponsel."></a><figcaption data-i18n="shot.home">Beranda: tautkan ponsel dengan kode QR resmi WhatsApp Web.</figcaption></figure>
+        <figure class="shot" data-reveal style="--d:1"><a href="assets/screens/accounts.webp"><img src="assets/screens/accounts.webp" width="1124" height="836" loading="lazy" data-i18n-attr="alt:shot.accounts.alt" alt="Toolbar dengan tiga tombol akun dan badge pesan belum dibaca, daftar chat tersamar."></a><figcaption data-i18n="shot.accounts">Tiga akun di toolbar, masing-masing dengan badge belum dibaca.</figcaption></figure>
+        <figure class="shot" data-reveal style="--d:2"><a href="assets/screens/lock.webp"><img src="assets/screens/lock.webp" width="1124" height="836" loading="lazy" data-i18n-attr="alt:shot.lock.alt" alt="Layar Your chats are locked dengan kolom password."></a><figcaption data-i18n="shot.lock">Kunci chat: masukkan password untuk membuka akun.</figcaption></figure>
+        <figure class="shot" data-reveal style="--d:0"><a href="assets/screens/privacy.webp"><img src="assets/screens/privacy.webp" width="1124" height="836" loading="lazy" data-i18n-attr="alt:shot.privacy.alt" alt="Pengaturan Privacy dengan bagian Chat lock dan Enable privacy blur."></a><figcaption data-i18n="shot.privacy">Pengaturan privasi: kunci chat dan blur untuk semua akun.</figcaption></figure>
+        <figure class="shot" data-reveal style="--d:1"><a href="assets/screens/settings.webp"><img src="assets/screens/settings.webp" width="1124" height="836" loading="lazy" data-i18n-attr="alt:shot.settings.alt" alt="Pengaturan General dengan pilihan tema, ikon tray, dan mulai saat login."></a><figcaption data-i18n="shot.settings">Pengaturan umum: tema, ikon tray, dan mulai saat login.</figcaption></figure>
+        <figure class="shot" data-reveal style="--d:2"><a href="assets/screens/about.webp"><img src="assets/screens/about.webp" width="1124" height="836" loading="lazy" data-i18n-attr="alt:shot.about.alt" alt="Halaman About and updates dengan tombol Check calling capabilities dan changelog."></a><figcaption data-i18n="shot.about">Tentang dan update, termasuk cek kemampuan panggilan.</figcaption></figure>
       </div>
     </div>
   </section>
 
-  <section aria-labelledby="fitur-judul">
+  <section id="fitur" aria-labelledby="fitur-judul">
     <div class="wrap">
-      <h2 id="fitur-judul">Yang bisa dilakukan</h2>
-      <p class="section-intro">Semua yang Anda pakai di WhatsApp Web, ditambah hal-hal yang biasanya hilang saat chat dibuka di tab browser.</p>
+      <h2 id="fitur-judul" data-reveal data-i18n="features.title">Yang bisa dilakukan</h2>
+      <p class="section-intro" data-reveal style="--d:1" data-i18n="features.intro">Semua yang Anda pakai di WhatsApp Web, ditambah hal-hal yang biasanya hilang saat chat dibuka di tab browser.</p>
       <ul class="features">
-        <li><h3>Beberapa akun dalam satu aplikasi</h3><p>Sampai tiga akun WhatsApp, Whaz 1 sampai Whaz 3. Setiap akun punya sesi sendiri dan tetap masuk setelah aplikasi ditutup.</p></li>
-        <li><h3>Panggilan suara dan video <span class="platform">Linux</span></h3><p>AppImage membawa mesin WebKit dengan WebRTC sendiri, jadi WhatsApp tidak lagi menolak panggilan di desktop.</p></li>
-        <li><h3>Notifikasi dan badge belum dibaca</h3><p>Notifikasi desktop untuk pesan baru. Di Linux, setiap tombol akun menampilkan jumlah chat yang belum dibaca.</p></li>
-        <li><h3>Blur privasi sekali klik <span class="platform">Linux</span></h3><p>Samarkan isi pesan, daftar chat, gambar dan media, atau seluruh layar. Pilihan disimpan per akun.</p></li>
-        <li><h3>Shortcut keyboard <span class="platform">Linux</span></h3><p><kbd>Ctrl</kbd> + <kbd>1</kbd> sampai <kbd>3</kbd> untuk pindah akun, <kbd>Ctrl</kbd> + <kbd>,</kbd> untuk pengaturan, <kbd>Ctrl</kbd> + <kbd>R</kbd> untuk memuat ulang.</p></li>
-        <li><h3>Cek update yang terverifikasi</h3><p>Aplikasi mengunduh installer baru, mencocokkannya dengan SHA256SUMS rilis, dan baru menyimpannya ke folder Unduhan kalau cocok.</p></li>
-        <li><h3>Kunci chat dengan password</h3><p>Pasang password apa saja yang Anda mau. Tidak ada aturan panjang minimum atau karakter wajib.</p></li>
-        <li><h3>Ringan untuk dipakai seharian <span class="platform">Linux</span></h3><p>Setiap akun memakai batas memori WebKit yang lebih ketat dan melepas memori lebih awal, tanpa menutup panggilan atau sesi.</p></li>
+        <li data-reveal style="--d:0"><span class="icon"><svg aria-hidden="true"><use href="#i-accounts"/></svg></span><div data-i18n="f1"><h3>Beberapa akun dalam satu aplikasi</h3><p>Sampai tiga akun WhatsApp, Whaz 1 sampai Whaz 3. Setiap akun punya sesi sendiri dan tetap masuk setelah aplikasi ditutup.</p></div></li>
+        <li data-reveal style="--d:1"><span class="icon"><svg aria-hidden="true"><use href="#i-call"/></svg></span><div data-i18n="f2"><h3>Panggilan suara dan video <span class="platform">Linux</span></h3><p>AppImage membawa mesin WebKit dengan WebRTC sendiri, jadi WhatsApp tidak lagi menolak panggilan di desktop.</p></div></li>
+        <li data-reveal style="--d:0"><span class="icon"><svg aria-hidden="true"><use href="#i-bell"/></svg></span><div data-i18n="f3"><h3>Notifikasi dan badge belum dibaca</h3><p>Notifikasi desktop untuk pesan baru. Di Linux, setiap tombol akun menampilkan jumlah chat yang belum dibaca.</p></div></li>
+        <li data-reveal style="--d:1"><span class="icon"><svg aria-hidden="true"><use href="#i-blur"/></svg></span><div data-i18n="f4"><h3>Blur privasi sekali klik <span class="platform">Linux</span></h3><p>Samarkan isi pesan, daftar chat, gambar dan media, atau seluruh layar. Pilihan disimpan per akun.</p></div></li>
+        <li data-reveal style="--d:0"><span class="icon"><svg aria-hidden="true"><use href="#i-keys"/></svg></span><div data-i18n="f5"><h3>Shortcut keyboard <span class="platform">Linux</span></h3><p><kbd>Ctrl</kbd> + <kbd>1</kbd> sampai <kbd>3</kbd> untuk pindah akun, <kbd>Ctrl</kbd> + <kbd>,</kbd> untuk pengaturan, <kbd>Ctrl</kbd> + <kbd>R</kbd> untuk memuat ulang.</p></div></li>
+        <li data-reveal style="--d:1"><span class="icon"><svg aria-hidden="true"><use href="#i-update"/></svg></span><div data-i18n="f6"><h3>Cek update yang terverifikasi</h3><p>Aplikasi mengunduh installer baru, mencocokkannya dengan SHA256SUMS rilis, dan baru menyimpannya ke folder Unduhan kalau cocok.</p></div></li>
+        <li data-reveal style="--d:0"><span class="icon"><svg aria-hidden="true"><use href="#i-lock"/></svg></span><div data-i18n="f7"><h3>Kunci chat dengan password</h3><p>Pasang password apa saja yang Anda mau. Tidak ada aturan panjang minimum atau karakter wajib.</p></div></li>
+        <li data-reveal style="--d:1"><span class="icon"><svg aria-hidden="true"><use href="#i-leaf"/></svg></span><div data-i18n="f8"><h3>Ringan untuk dipakai seharian <span class="platform">Linux</span></h3><p>Setiap akun memakai batas memori WebKit yang lebih ketat dan melepas memori lebih awal, tanpa menutup panggilan atau sesi.</p></div></li>
       </ul>
     </div>
   </section>
 
-  <section class="why" aria-labelledby="kenapa-judul">
+  <section class="rust" id="rust" aria-labelledby="rust-judul">
     <div class="wrap">
-      <h2 id="kenapa-judul">Kenapa Whazapp</h2>
+      <div>
+        <h2 id="rust-judul" data-reveal data-i18n="rust.title">Dibangun dengan Rust</h2>
+        <p class="rust-lead" data-reveal style="--d:1" data-i18n="rust.lead">Whazapp ditulis dengan Rust di atas Tauri 2. Bagian yang mengurus akun, notifikasi, kunci chat, blur privasi, dan update berjalan sebagai kode Rust native, bukan sebagai skrip di dalam halaman web.</p>
+      </div>
+      <ul>
+        <li data-reveal style="--d:1" data-i18n="rust.1"><h3>Aman memori</h3><p>Rust mencegah kesalahan memori seperti use-after-free dan buffer overflow sejak kompilasi.</p></li>
+        <li data-reveal style="--d:2" data-i18n="rust.2"><h3>Tanpa Electron</h3><p>Whazapp tidak membawa salinan Chromium. Windows memakai WebView2 bawaan sistem; AppImage Linux membawa WebKitGTK dengan dukungan panggilan.</p></li>
+        <li data-reveal style="--d:3" data-i18n="rust.3"><h3>Tetap WhatsApp Web yang resmi</h3><p>Isi chat dimuat langsung dari web.whatsapp.com. Kode Rust hanya mengurus jendela, akun, dan fitur di sekitarnya.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="why" id="kenapa" aria-labelledby="kenapa-judul">
+    <div class="wrap">
+      <h2 id="kenapa-judul" data-reveal data-i18n="why.title">Kenapa Whazapp</h2>
       <ol>
-        <li><h3>Native di Linux dan Windows</h3><p>AppImage untuk Linux x86_64, installer untuk Windows 10 dan 11 x64.</p></li>
-        <li><h3>Dibuat dengan Rust dan Tauri</h3><p>Memakai mesin web dari sistem: WebKitGTK di Linux, WebView2 di Windows.</p></li>
-        <li><h3>Tidak perlu browser tambahan</h3><p>WhatsApp tetap jalan tanpa Chrome atau Firefox yang harus terus terbuka.</p></li>
-        <li><h3>Unduhan diverifikasi SHA-256</h3><p>Setiap rilis menyertakan file SHA256SUMS yang bisa Anda periksa sendiri.</p></li>
+        <li data-reveal style="--d:0" data-i18n="why.1"><h3>Native di Linux dan Windows</h3><p>AppImage untuk Linux x86_64, installer untuk Windows 10 dan 11 x64.</p></li>
+        <li data-reveal style="--d:1" data-i18n="why.2"><h3>Rust dan Tauri</h3><p>Memakai mesin web dari sistem: WebKitGTK di Linux, WebView2 di Windows.</p></li>
+        <li data-reveal style="--d:2" data-i18n="why.3"><h3>Tidak perlu browser tambahan</h3><p>WhatsApp tetap jalan tanpa Chrome atau Firefox yang harus terus terbuka.</p></li>
+        <li data-reveal style="--d:3" data-i18n="why.4"><h3>Unduhan diverifikasi SHA-256</h3><p>Setiap rilis menyertakan file SHA256SUMS yang bisa Anda periksa sendiri.</p></li>
       </ol>
     </div>
   </section>
 
   <section id="unduh" aria-labelledby="unduh-judul">
     <div class="wrap">
-      <h2 id="unduh-judul">Unduh Whazapp <span data-version>0.1.5</span></h2>
+      <h2 id="unduh-judul" data-reveal data-i18n="dl.title">Unduh Whazapp <span data-version>0.1.5</span></h2>
       <div class="downloads">
-        <div class="download">
+        <div class="download" data-reveal style="--d:1">
           <h3>Linux</h3>
           <p class="file" data-file="appimage">Whazapp_0.1.5_amd64.AppImage</p>
-          <p class="note">Untuk Linux x86_64. Jadikan file bisa dijalankan dengan <code>chmod +x</code>, lalu buka.</p>
+          <p class="note" data-i18n="dl.linux">Untuk Linux x86_64. Jadikan file bisa dijalankan dengan <code>chmod +x</code>, lalu buka.</p>
           <a class="button" data-link="appimage" href="https://github.com/azislamayuda/zWhazapp/releases/latest">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
-            Unduh AppImage
+            <span data-i18n="dl.appimage">Unduh AppImage</span>
           </a>
         </div>
-        <div class="download">
+        <div class="download" data-reveal style="--d:2">
           <h3>Windows</h3>
           <p class="file" data-file="exe">Whazapp_0.1.5_x64-setup.exe</p>
-          <p class="note">Untuk Windows 10 dan 11, 64-bit.</p>
+          <p class="note" data-i18n="dl.windows">Untuk Windows 10 dan 11, 64-bit.</p>
           <a class="button" data-link="exe" href="https://github.com/azislamayuda/zWhazapp/releases/latest">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
-            Unduh setup.exe
+            <span data-i18n="dl.exe">Unduh setup.exe</span>
           </a>
-          <p class="note">Installer ini belum ditandatangani, jadi Windows SmartScreen mungkin menampilkan peringatan. Pilih More info lalu Run anyway.</p>
+          <p class="note" data-i18n="dl.unsigned">Installer ini belum ditandatangani, jadi Windows SmartScreen mungkin menampilkan peringatan. Pilih More info lalu Run anyway.</p>
         </div>
       </div>
-      <p class="all-releases"><a data-link="releases" href="https://github.com/azislamayuda/zWhazapp/releases/latest">Semua file dan catatan rilis di GitHub</a></p>
+      <p class="all-releases"><a data-link="releases" href="https://github.com/azislamayuda/zWhazapp/releases/latest" data-i18n="dl.all">Semua file dan catatan rilis di GitHub</a></p>
     </div>
   </section>
 
-  <section class="verify" aria-labelledby="verifikasi-judul">
+  <section class="verify" id="verifikasi" aria-labelledby="verifikasi-judul">
     <div class="wrap">
-      <h2 id="verifikasi-judul">Periksa file yang diunduh</h2>
-      <p class="section-intro">Unduh <a data-link="sums" href="https://github.com/azislamayuda/zWhazapp/releases/latest">SHA256SUMS</a> ke folder yang sama dengan installer, lalu jalankan di Linux:</p>
-      <pre><code>sha256sum -c SHA256SUMS</code></pre>
-      <p>Setiap file yang utuh ditandai <code>OK</code>. Kalau Anda hanya mengunduh satu installer, tambahkan <code>--ignore-missing</code>.</p>
-      <p>Kalau hasilnya <code>FAILED</code>, hapus file itu dan unduh ulang.</p>
+      <h2 id="verifikasi-judul" data-reveal data-i18n="verify.title">Periksa file yang diunduh</h2>
+      <p class="section-intro" data-i18n="verify.intro">Unduh <a data-link="sums" href="https://github.com/azislamayuda/zWhazapp/releases/latest">SHA256SUMS</a> ke folder yang sama dengan installer, lalu jalankan di Linux:</p>
+      <pre data-reveal style="--d:1"><code>sha256sum -c SHA256SUMS</code></pre>
+      <p data-i18n="verify.ok">Setiap file yang utuh ditandai <code>OK</code>. Kalau Anda hanya mengunduh satu installer, tambahkan <code>--ignore-missing</code>.</p>
+      <p data-i18n="verify.failed">Kalau hasilnya <code>FAILED</code>, hapus file itu dan unduh ulang.</p>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <p>Whazapp tidak berafiliasi dengan WhatsApp LLC.</p>
+    <p data-i18n="footer.affiliation">Whazapp tidak berafiliasi dengan WhatsApp LLC.</p>
     <p><a href="https://github.com/azislamayuda/zWhazapp/blob/main/LICENSE">MIT License</a> · <a href="https://github.com/azislamayuda/zWhazapp">GitHub</a></p>
   </div>
 </footer>
+
+<button class="to-top" id="to-top" type="button" aria-label="Kembali ke atas" title="Kembali ke atas" data-i18n-attr="aria-label:top;title:top">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5m0 0-6 6m6-6 6 6"/></svg>
+</button>
 
 <script>
   // Edit this block for each release; every link and version label on the page reads from it.
@@ -258,9 +361,140 @@
     exe: 'https://github.com/azislamayuda/zWhazapp/releases/download/v0.1.5/Whazapp_0.1.5_x64-setup.exe',
     sums: 'https://github.com/azislamayuda/zWhazapp/releases/download/v0.1.5/SHA256SUMS',
   };
-  for (const el of document.querySelectorAll('[data-link]')) el.href = RELEASE[el.dataset.link];
-  for (const el of document.querySelectorAll('[data-version]')) el.textContent = RELEASE.version;
-  for (const el of document.querySelectorAll('[data-file]')) el.textContent = decodeURIComponent(RELEASE[el.dataset.file].split('/').pop());
+  const fillRelease = () => {
+    for (const el of document.querySelectorAll('[data-link]')) el.href = RELEASE[el.dataset.link];
+    for (const el of document.querySelectorAll('[data-version]')) el.textContent = RELEASE.version;
+    for (const el of document.querySelectorAll('[data-file]')) el.textContent = decodeURIComponent(RELEASE[el.dataset.file].split('/').pop());
+  };
+
+  // English text. Indonesian is the text already in the HTML, so the page reads fine without JavaScript.
+  const EN = {
+    title: 'Whazapp for Linux and Windows',
+    desc: 'Whazapp opens WhatsApp Web as a desktop app for Linux and Windows: several accounts, calls, notifications and privacy blur.',
+    skip: 'Skip to content',
+    'nav.label': 'Main menu',
+    'nav.screens': 'Screenshots',
+    'nav.features': 'Features',
+    'nav.why': 'Why',
+    'nav.verify': 'Verify',
+    'nav.download': 'Download',
+    'hero.tagline': 'A little space. Endless stories.',
+    'hero.lead': 'WhatsApp Web as a desktop app for Linux and Windows. Several accounts, calls and notifications in one window, without opening a browser.',
+    'hero.download': 'Download version <span data-version></span>',
+    'hero.notes': 'Read the release notes',
+    'hero.built': 'Built with <a href="#rust">Rust</a> and Tauri 2.',
+    'screens.title': 'Screenshots',
+    'screens.intro': 'Whazapp 0.1.5 on Linux. Click a screenshot to see it full size.',
+    'shots.label': 'More screenshots, scroll sideways to see them all',
+    'shot.blur': 'Privacy blur: choose what to hide right from the chat page.',
+    'shot.blur.alt': 'Whazapp chat page with the blur menu open: Messages and Chat list are on, so messages and the chat list are blurred.',
+    'shot.home': 'Home: link your phone with the official WhatsApp Web QR code.',
+    'shot.home.alt': 'Whazapp home page with the Open WhatsApp Web button and three steps to link a phone.',
+    'shot.accounts': 'Three accounts in the toolbar, each with its unread badge.',
+    'shot.accounts.alt': 'Toolbar with three account buttons and unread badges; the chat list is blurred.',
+    'shot.lock': 'Chat lock: enter your password to open your accounts.',
+    'shot.lock.alt': 'The Your chats are locked screen with a password field.',
+    'shot.privacy': 'Privacy settings: chat lock and blur for every account.',
+    'shot.privacy.alt': 'Privacy settings with the Chat lock section and Enable privacy blur.',
+    'shot.settings': 'General settings: theme, tray icon and start at sign-in.',
+    'shot.settings.alt': 'General settings with theme, tray icon and start at sign-in options.',
+    'shot.about': 'About and updates, including a check of calling capabilities.',
+    'shot.about.alt': 'About and updates page with the Check calling capabilities button and the changelog.',
+    'features.title': 'What it does',
+    'features.intro': 'Everything you use in WhatsApp Web, plus what you usually lose when chats live in a browser tab.',
+    f1: '<h3>Several accounts in one app</h3><p>Up to three WhatsApp accounts, Whaz 1 to Whaz 3. Each has its own session and stays signed in after you close the app.</p>',
+    f2: '<h3>Voice and video calls <span class="platform">Linux</span></h3><p>The AppImage ships its own WebKit engine with WebRTC, so WhatsApp no longer refuses calls on the desktop.</p>',
+    f3: '<h3>Notifications and unread badges</h3><p>Desktop notifications for new messages. On Linux, each account button shows how many chats are unread.</p>',
+    f4: '<h3>One-click privacy blur <span class="platform">Linux</span></h3><p>Blur messages, the chat list, images and media, or the whole screen. Your choice is saved per account.</p>',
+    f5: '<h3>Keyboard shortcuts <span class="platform">Linux</span></h3><p><kbd>Ctrl</kbd> + <kbd>1</kbd> to <kbd>3</kbd> to switch accounts, <kbd>Ctrl</kbd> + <kbd>,</kbd> for settings, <kbd>Ctrl</kbd> + <kbd>R</kbd> to reload.</p>',
+    f6: '<h3>Verified update checks</h3><p>The app downloads the new installer, checks it against the release\'s SHA256SUMS, and saves it to your Downloads folder only when it matches.</p>',
+    f7: '<h3>Chat lock with a password</h3><p>Use any password you like. No minimum length and no required characters.</p>',
+    f8: '<h3>Light enough to keep open all day <span class="platform">Linux</span></h3><p>Each account uses tighter WebKit memory limits and frees memory earlier, without closing calls or sessions.</p>',
+    'rust.title': 'Built with Rust',
+    'rust.lead': 'Whazapp is written in Rust on top of Tauri 2. The parts that handle accounts, notifications, the chat lock, privacy blur and updates run as native Rust code, not as scripts inside a web page.',
+    'rust.1': '<h3>Memory safe</h3><p>Rust rules out memory errors such as use-after-free and buffer overflows at compile time.</p>',
+    'rust.2': '<h3>No Electron</h3><p>Whazapp does not ship its own copy of Chromium. Windows uses the system\'s WebView2; the Linux AppImage carries WebKitGTK with calling support.</p>',
+    'rust.3': '<h3>Still the official WhatsApp Web</h3><p>Chats load directly from web.whatsapp.com. The Rust code only runs the window, the accounts and the features around them.</p>',
+    'why.title': 'Why Whazapp',
+    'why.1': '<h3>Native on Linux and Windows</h3><p>An AppImage for Linux x86_64 and an installer for Windows 10 and 11 x64.</p>',
+    'why.2': '<h3>Rust and Tauri</h3><p>Uses the system\'s web engine: WebKitGTK on Linux, WebView2 on Windows.</p>',
+    'why.3': '<h3>No extra browser needed</h3><p>WhatsApp keeps running without Chrome or Firefox open all the time.</p>',
+    'why.4': '<h3>SHA-256 verified downloads</h3><p>Every release includes a SHA256SUMS file you can check yourself.</p>',
+    'dl.title': 'Download Whazapp <span data-version></span>',
+    'dl.linux': 'For Linux x86_64. Make the file executable with <code>chmod +x</code>, then open it.',
+    'dl.appimage': 'Download AppImage',
+    'dl.windows': 'For Windows 10 and 11, 64-bit.',
+    'dl.exe': 'Download setup.exe',
+    'dl.unsigned': 'This installer is not signed yet, so Windows SmartScreen may show a warning. Choose More info, then Run anyway.',
+    'dl.all': 'All files and release notes on GitHub',
+    'verify.title': 'Check your download',
+    'verify.intro': 'Download <a data-link="sums" href="#">SHA256SUMS</a> into the same folder as the installer, then run on Linux:',
+    'verify.ok': 'Each intact file is marked <code>OK</code>. If you downloaded only one installer, add <code>--ignore-missing</code>.',
+    'verify.failed': 'If the result is <code>FAILED</code>, delete that file and download it again.',
+    'footer.affiliation': 'Whazapp is not affiliated with WhatsApp LLC.',
+    top: 'Back to top',
+  };
+  const ID = {};
+  const meta = document.querySelector('meta[name="description"]');
+  const attrs = el => el.dataset.i18nAttr.split(';').map(pair => pair.split(':'));
+  for (const el of document.querySelectorAll('[data-i18n]')) ID[el.dataset.i18n] = el.innerHTML;
+  for (const el of document.querySelectorAll('[data-i18n-attr]')) for (const [name, key] of attrs(el)) ID[key] = el.getAttribute(name);
+  ID.title = document.title;
+  ID.desc = meta.content;
+  const langButton = document.getElementById('lang');
+  const setLang = (lang, remember) => {
+    const text = lang === 'en' ? EN : ID;
+    for (const el of document.querySelectorAll('[data-i18n]')) el.innerHTML = text[el.dataset.i18n] ?? ID[el.dataset.i18n];
+    for (const el of document.querySelectorAll('[data-i18n-attr]')) for (const [name, key] of attrs(el)) el.setAttribute(name, text[key] ?? ID[key]);
+    document.documentElement.lang = lang;
+    document.title = text.title;
+    meta.content = text.desc;
+    langButton.textContent = lang === 'en' ? 'ID' : 'EN';
+    langButton.setAttribute('lang', lang === 'en' ? 'id' : 'en');
+    langButton.setAttribute('aria-label', lang === 'en' ? 'Baca dalam bahasa Indonesia' : 'Read in English');
+    langButton.title = langButton.getAttribute('aria-label');
+    fillRelease();
+    if (remember) {
+      try { localStorage.setItem('whazapp-lang', lang); } catch {}
+      const url = new URL(location.href);
+      url.searchParams.set('lang', lang);
+      history.replaceState(null, '', url);
+    }
+  };
+  const pick = () => {
+    const asked = new URLSearchParams(location.search).get('lang');
+    if (asked === 'en' || asked === 'id') return asked;
+    try { const saved = localStorage.getItem('whazapp-lang'); if (saved === 'en' || saved === 'id') return saved; } catch {}
+    return (navigator.languages || [navigator.language]).some(l => /^(id|ms)\b/i.test(l)) ? 'id' : 'en';
+  };
+  setLang(pick(), false);
+  langButton.addEventListener('click', () => setLang(document.documentElement.lang === 'en' ? 'id' : 'en', true));
+
+  // Menu shrinks into a frosted bar and the back-to-top button appears as the page scrolls.
+  const menu = document.getElementById('menu');
+  const toTop = document.getElementById('to-top');
+  const calm = matchMedia('(prefers-reduced-motion: reduce)');
+  let queued = false;
+  const onScroll = () => {
+    queued = false;
+    menu.classList.toggle('scrolled', scrollY > 24);
+    toTop.classList.toggle('show', scrollY > innerHeight * 0.8);
+  };
+  addEventListener('scroll', () => { if (!queued) { queued = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+  toTop.addEventListener('click', () => {
+    scrollTo({ top: 0, behavior: calm.matches ? 'auto' : 'smooth' });
+    document.querySelector('.brand').focus({ preventScroll: true });
+  });
+
+  // Reveal blocks once as they enter the viewport.
+  const hidden = document.querySelectorAll('[data-reveal]');
+  if ('IntersectionObserver' in window) {
+    const watch = new IntersectionObserver(entries => {
+      for (const entry of entries) if (entry.isIntersecting) { entry.target.classList.add('in'); watch.unobserve(entry.target); }
+    }, { rootMargin: '0px 0px -8% 0px' });
+    hidden.forEach(el => watch.observe(el));
+  } else hidden.forEach(el => el.classList.add('in'));
 </script>
 
 <script type="module">
