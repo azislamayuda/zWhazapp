@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whazapp untuk Linux dan Windows</title>
+<meta name="description" content="Whazapp membuka WhatsApp Web sebagai aplikasi desktop untuk Linux dan Windows: beberapa akun, panggilan, notifikasi, dan blur privasi.">
+<link rel="icon" href="assets/icon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f3f8f4;
+    --surface: #fbfdfb;
+    --wash: #e2f1e7;
+    --line: #cce5d4;
+    --ink: #1f3d2e;
+    --muted: #4b6b57;
+    --green: #2c6e4a;
+    --green-hover: #245c3d;
+    --on-green: #ffffff;
+    --focus: #2c6e4a;
+    --dot: #4f9a6e;
+    --code-bg: #1f3d2e;
+    --code-ink: #e2f1e7;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #112019;
+      --surface: #182d22;
+      --wash: #1b3326;
+      --line: #2e4a39;
+      --ink: #dcefe3;
+      --muted: #9dbfa9;
+      --green: #8dcdab;
+      --green-hover: #a6dcbe;
+      --on-green: #10241a;
+      --focus: #a9dcc0;
+      --dot: #6fb48d;
+      --code-bg: #0b1711;
+      --code-ink: #dcefe3;
+      color-scheme: dark;
+    }
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 17px/1.6 "Atkinson Hyperlegible", system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: "Bricolage Grotesque", system-ui, sans-serif; line-height: 1.1; margin: 0; }
+  h2 { font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem); font-weight: 700; letter-spacing: -0.01em; }
+  h3 { font-size: 1.15rem; font-weight: 700; }
+  p { margin: 0; }
+  a { color: var(--green); text-underline-offset: 3px; }
+  a:hover { color: var(--green-hover); }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+  .wrap { width: min(1080px, 100%); margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px; } }
+
+  /* Hero: the dot field sits in the lower half, the text stays on calm background. */
+  .hero { position: relative; overflow: hidden; background: var(--wash); border-bottom: 1px solid var(--line); }
+  .hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+  .hero .wrap { position: relative; padding-top: clamp(56px, 10vw, 120px); padding-bottom: clamp(140px, 22vw, 240px); }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: var(--muted); margin-bottom: clamp(32px, 6vw, 64px); }
+  .brand img { width: 24px; height: 24px; border-radius: 6px; }
+  .hero h1 { font-size: clamp(3.25rem, 2rem + 7vw, 7rem); font-weight: 700; letter-spacing: -0.03em; }
+  .tagline { font-family: "Bricolage Grotesque", system-ui, sans-serif; font-size: clamp(1.15rem, 1rem + 0.8vw, 1.5rem); color: var(--muted); margin-top: 12px; }
+  .lead { max-width: 34em; margin-top: 24px; font-size: 1.1rem; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin-top: 32px; }
+
+  .button {
+    display: inline-flex; align-items: center; gap: 10px; min-height: 48px; padding: 12px 22px;
+    background: var(--green); color: var(--on-green); border-radius: 12px;
+    font-weight: 700; text-decoration: none; transition: background-color .15s;
+  }
+  .button:hover { background: var(--green-hover); color: var(--on-green); }
+  .button svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+  section { padding: clamp(64px, 9vw, 112px) 0; }
+  .section-intro { max-width: 36em; margin-top: 12px; color: var(--muted); }
+
+  /* Screens: one large shot, then the rest in a row that scrolls sideways on phones. */
+  .shot { margin: 0; }
+  .shot a { display: block; border-radius: 14px; }
+  .shot img { display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--line); box-shadow: 0 12px 40px rgba(31, 61, 46, .12); background: var(--surface); }
+  .shot figcaption { margin-top: 12px; font-size: .95rem; color: var(--muted); }
+  .shot-main { margin-top: 40px; }
+  .shot-main img { box-shadow: 0 24px 64px rgba(31, 61, 46, .18); }
+  .shot-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px 24px; margin-top: 48px; }
+  .shot-row:focus-visible { outline-offset: 8px; }
+  @media (max-width: 860px) { .shot-row { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) {
+    .shot-row { display: flex; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; }
+    .shot-row .shot { flex: 0 0 85%; scroll-snap-align: start; }
+  }
+
+  /* Features: a quiet two-column list, not a card grid. */
+  .features { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 56px; margin: 40px 0 0; padding: 0; list-style: none; }
+  .features li { padding: 22px 0; border-top: 1px solid var(--line); }
+  .features p { margin-top: 6px; color: var(--muted); }
+  .platform { display: inline-block; margin-left: 6px; font-family: "Atkinson Hyperlegible", sans-serif; font-size: .8rem; font-weight: 700; color: var(--muted); }
+  kbd { font: 700 .85em/1 "Atkinson Hyperlegible", sans-serif; padding: 2px 6px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; background: var(--surface); color: var(--ink); }
+  @media (max-width: 720px) { .features { grid-template-columns: 1fr; } }
+
+  /* Strengths: four short statements on the wash band. */
+  .why { background: var(--wash); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .why ol { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; margin: 40px 0 0; padding: 0; list-style: none; }
+  .why h3 { font-size: 1.35rem; }
+  .why p { margin-top: 10px; color: var(--muted); }
+  @media (max-width: 900px) { .why ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .why ol { grid-template-columns: 1fr; gap: 24px; } }
+
+  .downloads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 40px; }
+  .download { padding: 28px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .download .file { font-size: .9rem; color: var(--muted); overflow-wrap: anywhere; }
+  .download .button { align-self: flex-start; margin-top: 8px; }
+  .note { font-size: .92rem; color: var(--muted); }
+  .all-releases { margin-top: 24px; }
+  @media (max-width: 720px) { .downloads { grid-template-columns: 1fr; } .download { padding: 22px; } }
+
+  .verify { border-top: 1px solid var(--line); }
+  pre { margin: 24px 0 16px; padding: 18px 20px; background: var(--code-bg); color: var(--code-ink); border-radius: 12px; overflow-x: auto; font: 15px/1.5 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+  .verify p + p { margin-top: 10px; }
+  .verify p { max-width: 40em; }
+  code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; font-size: .92em; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 40px; color: var(--muted); font-size: .95rem; }
+  footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <canvas id="field" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="brand"><img src="assets/icon.png" alt="" width="24" height="24">Whazapp</div>
+    <h1>Whazapp</h1>
+    <p class="tagline">Sedikit ruang. Cerita tanpa akhir.</p>
+    <p class="lead">WhatsApp Web sebagai aplikasi desktop untuk Linux dan Windows. Beberapa akun, panggilan, dan notifikasi dalam satu jendela, tanpa membuka browser.</p>
+    <div class="actions">
+      <a class="button" href="#unduh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+        <span>Unduh versi <span data-version>0.1.5</span></span>
+      </a>
+      <a data-link="releases" href="https://github.com/azislamayuda/zWhazapp/releases/latest">Lihat catatan rilis</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section class="screens" aria-labelledby="tampilan-judul">
+    <div class="wrap">
+      <h2 id="tampilan-judul">Tampilan</h2>
+      <p class="section-intro">Tangkapan layar Whazapp 0.1.5 di Linux. Klik gambar untuk melihat ukuran penuh.</p>
+      <figure class="shot shot-main">
+        <a href="assets/screens/chat-blur.webp"><img src="assets/screens/chat-blur.webp" width="1124" height="836" alt="Halaman chat Whazapp dengan menu blur terbuka: pilihan Messages dan Chat list aktif, sehingga isi pesan dan daftar chat tersamar."></a>
+        <figcaption>Blur privasi: pilih area yang disamarkan langsung dari halaman chat.</figcaption>
+      </figure>
+      <div class="shot-row" tabindex="0" role="region" aria-label="Tangkapan layar lain, geser untuk melihat semua">
+        <figure class="shot"><a href="assets/screens/home.webp"><img src="assets/screens/home.webp" width="1124" height="836" loading="lazy" alt="Beranda Whazapp dengan tombol Open WhatsApp Web dan tiga langkah menautkan ponsel."></a><figcaption>Beranda: tautkan ponsel dengan kode QR resmi WhatsApp Web.</figcaption></figure>
+        <figure class="shot"><a href="assets/screens/accounts.webp"><img src="assets/screens/accounts.webp" width="1124" height="836" loading="lazy" alt="Toolbar dengan tiga tombol akun dan badge pesan belum dibaca, daftar chat tersamar."></a><figcaption>Tiga akun di toolbar, masing-masing dengan badge belum dibaca.</figcaption></figure>
+        <figure class="shot"><a href="assets/screens/lock.webp"><img src="assets/screens/lock.webp" width="1124" height="836" loading="lazy" alt="Layar Your chats are locked dengan kolom password."></a><figcaption>Kunci chat: masukkan password untuk membuka akun.</figcaption></figure>
+        <figure class="shot"><a href="assets/screens/privacy.webp"><img src="assets/screens/privacy.webp" width="1124" height="836" loading="lazy" alt="Pengaturan Privacy dengan bagian Chat lock dan Enable privacy blur."></a><figcaption>Pengaturan privasi: kunci chat dan blur untuk semua akun.</figcaption></figure>
+        <figure class="shot"><a href="assets/screens/settings.webp"><img src="assets/screens/settings.webp" width="1124" height="836" loading="lazy" alt="Pengaturan General dengan pilihan tema, ikon tray, dan mulai saat login."></a><figcaption>Pengaturan umum: tema, ikon tray, dan mulai saat login.</figcaption></figure>
+        <figure class="shot"><a href="assets/screens/about.webp"><img src="assets/screens/about.webp" width="1124" height="836" loading="lazy" alt="Halaman About and updates dengan tombol Check calling capabilities dan changelog."></a><figcaption>Tentang dan update, termasuk cek kemampuan panggilan.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="fitur-judul">
+    <div class="wrap">
+      <h2 id="fitur-judul">Yang bisa dilakukan</h2>
+      <p class="section-intro">Semua yang Anda pakai di WhatsApp Web, ditambah hal-hal yang biasanya hilang saat chat dibuka di tab browser.</p>
+      <ul class="features">
+        <li><h3>Beberapa akun dalam satu aplikasi</h3><p>Sampai tiga akun WhatsApp, Whaz 1 sampai Whaz 3. Setiap akun punya sesi sendiri dan tetap masuk setelah aplikasi ditutup.</p></li>
+        <li><h3>Panggilan suara dan video <span class="platform">Linux</span></h3><p>AppImage membawa mesin WebKit dengan WebRTC sendiri, jadi WhatsApp tidak lagi menolak panggilan di desktop.</p></li>
+        <li><h3>Notifikasi dan badge belum dibaca</h3><p>Notifikasi desktop untuk pesan baru. Di Linux, setiap tombol akun menampilkan jumlah chat yang belum dibaca.</p></li>
+        <li><h3>Blur privasi sekali klik <span class="platform">Linux</span></h3><p>Samarkan isi pesan, daftar chat, gambar dan media, atau seluruh layar. Pilihan disimpan per akun.</p></li>
+        <li><h3>Shortcut keyboard <span class="platform">Linux</span></h3><p><kbd>Ctrl</kbd> + <kbd>1</kbd> sampai <kbd>3</kbd> untuk pindah akun, <kbd>Ctrl</kbd> + <kbd>,</kbd> untuk pengaturan, <kbd>Ctrl</kbd> + <kbd>R</kbd> untuk memuat ulang.</p></li>
+        <li><h3>Cek update yang terverifikasi</h3><p>Aplikasi mengunduh installer baru, mencocokkannya dengan SHA256SUMS rilis, dan baru menyimpannya ke folder Unduhan kalau cocok.</p></li>
+        <li><h3>Kunci chat dengan password</h3><p>Pasang password apa saja yang Anda mau. Tidak ada aturan panjang minimum atau karakter wajib.</p></li>
+        <li><h3>Ringan untuk dipakai seharian <span class="platform">Linux</span></h3><p>Setiap akun memakai batas memori WebKit yang lebih ketat dan melepas memori lebih awal, tanpa menutup panggilan atau sesi.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="why" aria-labelledby="kenapa-judul">
+    <div class="wrap">
+      <h2 id="kenapa-judul">Kenapa Whazapp</h2>
+      <ol>
+        <li><h3>Native di Linux dan Windows</h3><p>AppImage untuk Linux x86_64, installer untuk Windows 10 dan 11 x64.</p></li>
+        <li><h3>Dibuat dengan Rust dan Tauri</h3><p>Memakai mesin web dari sistem: WebKitGTK di Linux, WebView2 di Windows.</p></li>
+        <li><h3>Tidak perlu browser tambahan</h3><p>WhatsApp tetap jalan tanpa Chrome atau Firefox yang harus terus terbuka.</p></li>
+        <li><h3>Unduhan diverifikasi SHA-256</h3><p>Setiap rilis menyertakan file SHA256SUMS yang bisa Anda periksa sendiri.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="unduh" aria-labelledby="unduh-judul">
+    <div class="wrap">
+      <h2 id="unduh-judul">Unduh Whazapp <span data-version>0.1.5</span></h2>
+      <div class="downloads">
+        <div class="download">
+          <h3>Linux</h3>
+          <p class="file" data-file="appimage">Whazapp_0.1.5_amd64.AppImage</p>
+          <p class="note">Untuk Linux x86_64. Jadikan file bisa dijalankan dengan <code>chmod +x</code>, lalu buka.</p>
+          <a class="button" data-link="appimage" href="https://github.com/azislamayuda/zWhazapp/releases/latest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+            Unduh AppImage
+          </a>
+        </div>
+        <div class="download">
+          <h3>Windows</h3>
+          <p class="file" data-file="exe">Whazapp_0.1.5_x64-setup.exe</p>
+          <p class="note">Untuk Windows 10 dan 11, 64-bit.</p>
+          <a class="button" data-link="exe" href="https://github.com/azislamayuda/zWhazapp/releases/latest">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19h14"/></svg>
+            Unduh setup.exe
+          </a>
+          <p class="note">Installer ini belum ditandatangani, jadi Windows SmartScreen mungkin menampilkan peringatan. Pilih More info lalu Run anyway.</p>
+        </div>
+      </div>
+      <p class="all-releases"><a data-link="releases" href="https://github.com/azislamayuda/zWhazapp/releases/latest">Semua file dan catatan rilis di GitHub</a></p>
+    </div>
+  </section>
+
+  <section class="verify" aria-labelledby="verifikasi-judul">
+    <div class="wrap">
+      <h2 id="verifikasi-judul">Periksa file yang diunduh</h2>
+      <p class="section-intro">Unduh <a data-link="sums" href="https://github.com/azislamayuda/zWhazapp/releases/latest">SHA256SUMS</a> ke folder yang sama dengan installer, lalu jalankan di Linux:</p>
+      <pre><code>sha256sum -c SHA256SUMS</code></pre>
+      <p>Setiap file yang utuh ditandai <code>OK</code>. Kalau Anda hanya mengunduh satu installer, tambahkan <code>--ignore-missing</code>.</p>
+      <p>Kalau hasilnya <code>FAILED</code>, hapus file itu dan unduh ulang.</p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Whazapp tidak berafiliasi dengan WhatsApp LLC.</p>
+    <p><a href="https://github.com/azislamayuda/zWhazapp/blob/main/LICENSE">MIT License</a> · <a href="https://github.com/azislamayuda/zWhazapp">GitHub</a></p>
+  </div>
+</footer>
+
+<script>
+  // Edit this block for each release; every link and version label on the page reads from it.
+  const RELEASE = {
+    version: '0.1.5',
+    releases: 'https://github.com/azislamayuda/zWhazapp/releases/latest',
+    appimage: 'https://github.com/azislamayuda/zWhazapp/releases/download/v0.1.5/Whazapp_0.1.5_amd64.AppImage',
+    exe: 'https://github.com/azislamayuda/zWhazapp/releases/download/v0.1.5/Whazapp_0.1.5_x64-setup.exe',
+    sums: 'https://github.com/azislamayuda/zWhazapp/releases/download/v0.1.5/SHA256SUMS',
+  };
+  for (const el of document.querySelectorAll('[data-link]')) el.href = RELEASE[el.dataset.link];
+  for (const el of document.querySelectorAll('[data-version]')) el.textContent = RELEASE.version;
+  for (const el of document.querySelectorAll('[data-file]')) el.textContent = decodeURIComponent(RELEASE[el.dataset.file].split('/').pop());
+</script>
+
+<script type="module">
+  // Hero background: a slow field of soft dots that rolls like a breathing surface.
+  // Only decoration; the page works the same if WebGL or the CDN is unavailable.
+  const canvas = document.getElementById('field');
+  const still = matchMedia('(prefers-reduced-motion: reduce)');
+  const dark = matchMedia('(prefers-color-scheme: dark)');
+  try {
+    const THREE = await import('https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 3.2, 9);
+    camera.lookAt(0, -0.6, 0);
+
+    const cols = 90, rows = 34;
+    const base = new Float32Array(cols * rows * 3);
+    for (let r = 0, i = 0; r < rows; r++) for (let c = 0; c < cols; c++, i += 3) {
+      base[i] = (c / (cols - 1) - 0.5) * 22;
+      base[i + 2] = (r / (rows - 1) - 0.5) * 10;
+    }
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(base.slice(), 3));
+    const material = new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false,
+      uniforms: { color: { value: new THREE.Color() }, scale: { value: 1 } },
+      vertexShader: `uniform float scale; varying float fade;
+        void main() { vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          fade = smoothstep(16.0, 6.0, -mv.z);
+          gl_PointSize = scale * 34.0 / -mv.z; gl_Position = projectionMatrix * mv; }`,
+      fragmentShader: `uniform vec3 color; varying float fade;
+        void main() { float d = length(gl_PointCoord - 0.5);
+          gl_FragColor = vec4(color, smoothstep(0.5, 0.15, d) * 0.55 * fade); }`,
+    });
+    const points = new THREE.Points(geometry, material);
+    points.position.y = -1.6;
+    scene.add(points);
+
+    const pos = geometry.attributes.position.array;
+    const shape = t => {
+      for (let i = 0; i < pos.length; i += 3) {
+        const x = base[i], z = base[i + 2];
+        pos[i + 1] = Math.sin(x * 0.35 + t * 0.35) * 0.45 + Math.sin(z * 0.6 - t * 0.25) * 0.3;
+      }
+      geometry.attributes.position.needsUpdate = true;
+    };
+    const paint = () => material.uniforms.color.value.set(getComputedStyle(document.documentElement).getPropertyValue('--dot').trim());
+    const size = () => {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      material.uniforms.scale.value = renderer.getPixelRatio() * Math.min(1, w / 900 + 0.35);
+    };
+    const draw = t => { shape(t); renderer.render(scene, camera); };
+
+    let frame = 0, visible = true, start = performance.now();
+    const loop = now => { draw((now - start) / 1000); frame = requestAnimationFrame(loop); };
+    const update = () => {
+      cancelAnimationFrame(frame);
+      if (still.matches || !visible || document.hidden) draw(still.matches ? 0 : (performance.now() - start) / 1000);
+      else frame = requestAnimationFrame(loop);
+    };
+    new ResizeObserver(() => { size(); update(); }).observe(canvas);
+    new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); }).observe(canvas);
+    document.addEventListener('visibilitychange', update);
+    still.addEventListener('change', update);
+    dark.addEventListener('change', () => { paint(); update(); });
+    paint(); size(); update();
+  } catch (error) {
+    canvas.remove();
+  }
+</script>
+</body>
+</html>
